@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BizExplorer - AI Business Research</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #050914;
+    --nav: #070c1a;
+    --panel: #0d1427;
+    --panel-2: #111a31;
+    --panel-3: #172039;
+    --line: rgba(143, 168, 225, 0.18);
+    --line-strong: rgba(148, 178, 245, 0.34);
+    --text: #f7f9ff;
+    --muted: #9ea9c6;
+    --soft: #cbd5f4;
+    --blue: #2688ff;
+    --violet: #8c3dff;
+    --cyan: #22c7d8;
+    --green: #22d085;
+    --amber: #ffb020;
+    --red: #ff5b6e;
+    --shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background:
+      radial-gradient(circle at 20% 0%, rgba(39, 132, 255, 0.16), transparent 30%),
+      radial-gradient(circle at 100% 20%, rgba(34, 199, 216, 0.10), transparent 24%),
+      linear-gradient(130deg, #040712 0%, #080d1d 42%, #061220 100%);
+    color: var(--text);
+  }
+
+  button, input { font: inherit; }
+
+  a { color: inherit; }
+
+  .app {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    padding: 24px 18px;
+    border-right: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(8, 13, 29, 0.98), rgba(5, 9, 20, 0.96));
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 2px 8px 8px;
+  }
+
+  .brand-mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background:
+      linear-gradient(135deg, #20c7dc 0 45%, transparent 45%),
+      linear-gradient(315deg, #8c3dff 0 55%, #2c8dff 55%);
+    box-shadow: 0 12px 36px rgba(39, 132, 255, 0.34);
+  }
+
+  .brand-title {
+    font-size: 22px;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: 0;
+  }
+
+  .brand-title span { color: #a98dff; }
+  .brand-subtitle { margin-top: 5px; color: var(--muted); font-size: 12px; }
+
+  .nav {
+    display: grid;
+    gap: 8px;
+  }
+
+  .nav-item {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    align-items: center;
+    min-height: 46px;
+    padding: 0 12px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: var(--soft);
+    background: transparent;
+  }
+
+  .nav-item.active {
+    border-color: rgba(140, 61, 255, 0.55);
+    background: linear-gradient(90deg, rgba(140, 61, 255, 0.25), rgba(38, 136, 255, 0.09));
+    box-shadow: inset 0 0 26px rgba(140, 61, 255, 0.14);
+  }
+
+  .nav-icon {
+    width: 22px;
+    height: 22px;
+    border: 1px solid rgba(158, 169, 198, 0.38);
+    border-radius: 7px;
+    display: grid;
+    place-items: center;
+    color: #b8c4ec;
+    font-size: 12px;
+  }
+
+  .agent-card {
+    margin-top: auto;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px;
+    background: linear-gradient(155deg, rgba(22, 32, 57, 0.94), rgba(7, 13, 29, 0.94));
+    box-shadow: var(--shadow);
+  }
+
+  .agent-orb {
+    width: 78px;
+    height: 78px;
+    border-radius: 22px;
+    margin-bottom: 14px;
+    background:
+      linear-gradient(180deg, rgba(38, 136, 255, 0.88), rgba(140, 61, 255, 0.58)),
+      linear-gradient(90deg, transparent 45%, rgba(255,255,255,0.24) 45% 55%, transparent 55%);
+    position: relative;
+    box-shadow: 0 18px 46px rgba(38, 136, 255, 0.28);
+  }
+
+  .agent-orb::before,
+  .agent-orb::after {
+    content: "";
+    position: absolute;
+    top: 29px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #aeefff;
+    box-shadow: 0 0 18px rgba(174, 239, 255, 0.88);
+  }
+
+  .agent-orb::before { left: 22px; }
+  .agent-orb::after { right: 22px; }
+
+  .online {
+    color: #3df39a;
+    font-weight: 750;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .agent-copy {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .content {
+    padding: 26px;
+    min-width: 0;
+  }
+
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    align-items: center;
+    margin-bottom: 22px;
+  }
+
+  .eyebrow {
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 6px;
+  }
+
+  h1, h2, h3, p { margin: 0; }
+  h1 { font-size: clamp(24px, 3vw, 32px); line-height: 1.1; letter-spacing: 0; }
+  h2 { font-size: 15px; letter-spacing: 0; text-transform: uppercase; }
+
+  .profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(17, 26, 49, 0.72);
+  }
+
+  .avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #22c7d8, #8c3dff);
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+  }
+
+  .profile strong { display: block; font-size: 14px; }
+  .profile span { color: var(--muted); font-size: 12px; }
+
+  .dashboard {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .main-stack, .rail {
+    display: grid;
+    gap: 18px;
+    min-width: 0;
+  }
+
+  .panel {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: linear-gradient(180deg, rgba(16, 24, 45, 0.92), rgba(9, 15, 31, 0.94));
+    box-shadow: var(--shadow);
+  }
+
+  .launch-panel {
+    padding: 20px;
+  }
+
+  .form-grid {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px;
+  }
+
+  .input-wrap {
+    min-width: 0;
+  }
+
+  label {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    margin-bottom: 7px;
+  }
+
+  input {
+    width: 100%;
+    height: 52px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(7, 13, 29, 0.86);
+    color: var(--text);
+    padding: 0 16px;
+    outline: none;
+  }
+
+  input:focus {
+    border-color: rgba(38, 136, 255, 0.8);
+    box-shadow: 0 0 0 4px rgba(38, 136, 255, 0.12);
+  }
+
+  .launch-button {
+    align-self: end;
+    height: 52px;
+    border: 0;
+    border-radius: 8px;
+    padding: 0 22px;
+    color: #fff;
+    font-weight: 750;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--blue), var(--violet));
+    box-shadow: 0 16px 34px rgba(38, 136, 255, 0.28);
+    white-space: nowrap;
+  }
+
+  .launch-button:disabled {
+    opacity: 0.58;
+    cursor: wait;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .chip {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(17, 26, 49, 0.72);
+    color: var(--soft);
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+
+  .progress-shell {
+    margin-top: 18px;
+    height: 9px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(7, 13, 29, 0.9);
+    border: 1px solid var(--line);
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--cyan), var(--blue), var(--violet));
+    transition: width .28s ease;
+  }
+
+  .map-panel {
+    min-height: 260px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .map-panel::before {
+    content: "";
+    position: absolute;
+    inset: 52px 18px 18px;
+    opacity: 0.65;
+    background:
+      linear-gradient(rgba(98, 126, 190, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(98, 126, 190, 0.08) 1px, transparent 1px),
+      radial-gradient(circle at 46% 42%, rgba(140, 61, 255, 0.32), transparent 24%),
+      linear-gradient(145deg, rgba(38, 136, 255, 0.18), transparent 42%);
+    background-size: 42px 42px, 42px 42px, 100% 100%, 100% 100%;
+    transform: perspective(620px) rotateX(58deg) translateY(-70px);
+    transform-origin: center;
+  }
+
+  .map-title {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .live-pill {
+    color: #34e99a;
+    border: 1px solid rgba(34, 208, 133, 0.4);
+    background: rgba(34, 208, 133, 0.08);
+    padding: 6px 9px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 750;
+  }
+
+  .map-nodes {
+    position: absolute;
+    inset: 68px 40px 28px;
+    z-index: 1;
+  }
+
+  .node {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.78);
+    box-shadow: 0 0 24px currentColor;
+  }
+
+  .node.blue { color: var(--blue); background: var(--blue); }
+  .node.green { color: var(--green); background: var(--green); }
+  .node.violet { color: var(--violet); background: var(--violet); }
+  .node.amber { color: var(--amber); background: var(--amber); }
+
+  .map-center {
+    position: absolute;
+    left: 50%;
+    top: 52%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    padding: 10px 16px;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 800;
+    background: rgba(7, 13, 29, 0.76);
+    border: 1px solid var(--line-strong);
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .stat {
+    min-height: 92px;
+    padding: 15px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(17, 26, 49, 0.76);
+  }
+
+  .stat span {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .stat strong {
+    display: block;
+    margin-top: 8px;
+    font-size: 25px;
+    letter-spacing: 0;
+  }
+
+  .results-panel {
+    padding: 18px;
+  }
+
+  .panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .business-card {
+    min-height: 210px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(19, 29, 54, 0.94), rgba(9, 15, 31, 0.96));
+  }
+
+  .card-visual {
+    height: 80px;
+    background:
+      linear-gradient(135deg, rgba(38, 136, 255, 0.54), rgba(255, 176, 32, 0.22)),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 18px);
+    position: relative;
+  }
+
+  .rank {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, #ffc64b, #ff8a1d);
+    color: #1b1300;
+    font-weight: 850;
+  }
+
+  .verified {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    padding: 5px 8px;
+    border-radius: 8px;
+    color: #dbfff0;
+    background: rgba(34, 208, 133, 0.78);
+    font-size: 11px;
+    font-weight: 850;
+  }
+
+  .card-body {
+    padding: 14px;
+  }
+
+  .card-body h3 {
+    font-size: 16px;
+    line-height: 1.25;
+    margin-bottom: 8px;
+    overflow-wrap: anywhere;
+  }
+
+  .mini {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .confidence {
+    margin-top: 14px;
+  }
+
+  .confidence-row {
+    display: flex;
+    justify-content: space-between;
+    color: var(--soft);
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  .meter {
+    height: 7px;
+    border-radius: 999px;
+    background: rgba(126, 146, 196, 0.22);
+    overflow: hidden;
+  }
+
+  .meter span {
+    display: block;
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--green), var(--cyan));
+  }
+
+  .empty {
+    border: 1px dashed var(--line-strong);
+    border-radius: 8px;
+    min-height: 180px;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    text-align: center;
+    padding: 18px;
+  }
+
+  .flow-panel, .insights-panel, .actions-panel, .activity-panel {
+    padding: 18px;
+  }
+
+  .flow-list {
+    display: grid;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .flow-item {
+    display: grid;
+    grid-template-columns: 28px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    min-height: 44px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    background: rgba(17, 26, 49, 0.72);
+  }
+
+  .flow-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+    color: #041018;
+    font-weight: 900;
+    background: var(--green);
+  }
+
+  .flow-item.pending { opacity: 0.56; }
+  .flow-item.running .flow-dot { background: var(--violet); color: #fff; }
+  .flow-item.pending .flow-dot { background: #303b5a; color: var(--muted); }
+  .flow-label { font-size: 13px; }
+  .flow-state { color: var(--green); font-size: 11px; font-weight: 750; }
+  .flow-item.running .flow-state { color: #caaeff; }
+  .flow-item.pending .flow-state { color: var(--muted); }
+
+  .insight-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .insight {
+    min-height: 86px;
+    border-radius: 8px;
+    padding: 13px;
+    border: 1px solid var(--line);
+    background: rgba(17, 26, 49, 0.72);
+  }
+
+  .insight.cyan { border-color: rgba(34, 199, 216, 0.34); background: rgba(34, 199, 216, 0.10); }
+  .insight.amber { border-color: rgba(255, 176, 32, 0.34); background: rgba(255, 176, 32, 0.10); }
+  .insight.green { border-color: rgba(34, 208, 133, 0.34); background: rgba(34, 208, 133, 0.10); }
+  .insight.red { border-color: rgba(255, 91, 110, 0.34); background: rgba(255, 91, 110, 0.10); }
+  .insight span { display: block; color: var(--muted); font-size: 12px; }
+  .insight strong { display: block; margin-top: 8px; font-size: 24px; }
+
+  .actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .action-link {
+    min-height: 58px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 11px;
+    text-decoration: none;
+    display: grid;
+    align-content: center;
+    gap: 3px;
+    background: rgba(17, 26, 49, 0.72);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .action-link.ready {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .action-link strong { font-size: 13px; }
+  .action-link span { color: var(--muted); font-size: 11px; }
+  .action-link.json { border-color: rgba(38, 136, 255, 0.35); }
+  .action-link.csv { border-color: rgba(34, 208, 133, 0.35); }
+
+  .activity-log {
+    margin-top: 12px;
+    height: 190px;
+    overflow-y: auto;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 12px;
+    color: var(--muted);
+    display: grid;
+    align-content: start;
+    gap: 8px;
+  }
+
+  .activity-log div {
+    padding: 8px 9px;
+    border-radius: 8px;
+    background: rgba(7, 13, 29, 0.68);
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 1180px) {
+    .app { grid-template-columns: 92px minmax(0, 1fr); }
+    .brand-copy, .nav-label, .agent-card { display: none; }
+    .sidebar { padding-left: 16px; padding-right: 16px; align-items: center; }
+    .nav-item { grid-template-columns: 1fr; padding: 0; width: 46px; justify-items: center; }
+    .dashboard { grid-template-columns: 1fr; }
+    .rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 780px) {
+    .app { display: block; }
+    .sidebar { position: static; height: auto; flex-direction: row; overflow-x: auto; justify-content: space-between; }
+    .brand { min-width: 58px; padding: 0; }
+    .nav { grid-auto-flow: column; grid-auto-columns: 46px; }
+    .content { padding: 18px 14px; }
+    .topbar { align-items: flex-start; }
+    .profile { display: none; }
+    .form-grid, .stat-grid, .results-grid, .rail, .insight-grid, .actions { grid-template-columns: 1fr; }
+    .launch-button { width: 100%; }
+    .map-panel { min-height: 220px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true"></div>
+      <div class="brand-copy">
+        <div class="brand-title">BIZ<span>EXPLORER</span></div>
+        <div class="brand-subtitle">AI Business Research Agent</div>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Dashboard navigation">
+      <div class="nav-item active"><span class="nav-icon">+</span><span class="nav-label">New Research</span></div>
+      <div class="nav-item"><span class="nav-icon">D</span><span class="nav-label">Dashboard</span></div>
+      <div class="nav-item"><span class="nav-icon">L</span><span class="nav-label">Live Research</span></div>
+      <div class="nav-item"><span class="nav-icon">R</span><span class="nav-label">Business Results</span></div>
+      <div class="nav-item"><span class="nav-icon">V</span><span class="nav-label">Data Verification</span></div>
+      <div class="nav-item"><span class="nav-icon">E</span><span class="nav-label">Export Center</span></div>
+    </nav>
+
+    <section class="agent-card">
+      <div class="agent-orb" aria-hidden="true"></div>
+      <div class="online">AI Agent Online</div>
+      <p class="agent-copy">Autonomous researcher ready for verified discovery.</p>
+    </section>
+  </aside>
+
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <h1>Good evening, Sankar</h1>
+        <p class="eyebrow">Start a new search or review the latest discovery insights.</p>
+      </div>
+      <div class="profile">
+        <div class="avatar">SP</div>
+        <div><strong>Sankar Pandi</strong><span>Researcher</span></div>
+      </div>
+    </header>
+
+    <div class="dashboard">
+      <section class="main-stack">
+        <section class="panel launch-panel">
+          <h2>Start New Business Research</h2>
+          <div class="form-grid">
+            <div class="input-wrap">
+              <label for="query">Business Query</label>
+              <input id="query" value="Lifeline Hospitals in Chennai" placeholder='e.g. "Hospitals in Chennai"' />
+            </div>
+            <button id="go" class="launch-button">Launch AI Research</button>
+          </div>
+          <div class="chips">
+            <button class="chip" data-query="Lifeline Hospitals in Chennai">Lifeline Hospitals</button>
+            <button class="chip" data-query="Dentists in Austin">Dentists</button>
+            <button class="chip" data-query="Restaurants in Chennai">Restaurants</button>
+            <button class="chip" data-query="Hotels in Austin">Hotels</button>
+          </div>
+          <div class="progress-shell"><div id="fill" class="progress-fill"></div></div>
+        </section>
+
+        <section class="panel map-panel">
+          <div class="map-title">
+            <h2>Research Coverage Map</h2>
+            <span id="runState" class="live-pill">Ready</span>
+          </div>
+          <div class="map-center" id="mapCenter">Chennai</div>
+          <div class="map-nodes" aria-hidden="true">
+            <span class="node blue" style="left: 14%; top: 62%;"></span>
+            <span class="node green" style="left: 32%; top: 48%;"></span>
+            <span class="node violet" style="left: 48%; top: 38%;"></span>
+            <span class="node amber" style="left: 62%; top: 58%;"></span>
+            <span class="node green" style="left: 80%; top: 42%;"></span>
+          </div>
+        </section>
+
+        <section class="stat-grid" aria-label="Research summary">
+          <div class="stat"><span>Businesses Discovered</span><strong id="statDiscovered">0</strong></div>
+          <div class="stat"><span>Profiles Extracted</span><strong id="statProfiles">0</strong></div>
+          <div class="stat"><span>Fully Verified</span><strong id="statVerified">0</strong></div>
+          <div class="stat"><span>Pages Crawled</span><strong id="statPages">0</strong></div>
+        </section>
+
+        <section class="panel results-panel">
+          <div class="panel-head">
+            <h2>Top Businesses Discovered</h2>
+            <span class="live-pill" id="durationPill">0 Minutes 0 Seconds</span>
+          </div>
+          <div id="businesses" class="results-grid">
+            <div class="empty">Verified businesses will appear here as the agent completes extraction.</div>
+          </div>
+        </section>
+      </section>
+
+      <aside class="rail">
+        <section class="panel flow-panel">
+          <h2>AI Research Flow</h2>
+          <div id="flow" class="flow-list"></div>
+        </section>
+
+        <section class="panel insights-panel">
+          <h2>Research Insights</h2>
+          <div class="insight-grid">
+            <div class="insight cyan"><span>Websites Visited</span><strong id="insightSites">0</strong></div>
+            <div class="insight amber"><span>Confidence</span><strong id="insightConfidence">0%</strong></div>
+            <div class="insight green"><span>Cache Hits</span><strong id="insightCache">0</strong></div>
+            <div class="insight red"><span>Manual Review</span><strong id="insightManual">0</strong></div>
+          </div>
+        </section>
+
+        <section class="panel actions-panel">
+          <h2>Quick Actions</h2>
+          <div class="actions">
+            <a id="jsonExport" class="action-link json" href="#" target="_blank"><strong>Export JSON</strong><span>Full report</span></a>
+            <a id="csvExport" class="action-link csv" href="#" target="_blank"><strong>Export CSV</strong><span>Spreadsheet</span></a>
+          </div>
+        </section>
+
+        <section class="panel activity-panel">
+          <h2>Agent Activity</h2>
+          <div id="activityLog" class="activity-log"></div>
+        </section>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<script>
+const activityEl = document.getElementById('activityLog');
+const fillEl = document.getElementById('fill');
+const businessesEl = document.getElementById('businesses');
+const btn = document.getElementById('go');
+const runStateEl = document.getElementById('runState');
+const flowEl = document.getElementById('flow');
+
+const stats = {
+  discovered: document.getElementById('statDiscovered'),
+  profiles: document.getElementById('statProfiles'),
+  verified: document.getElementById('statVerified'),
+  pages: document.getElementById('statPages'),
+  sites: document.getElementById('insightSites'),
+  confidence: document.getElementById('insightConfidence'),
+  cache: document.getElementById('insightCache'),
+  manual: document.getElementById('insightManual'),
+  duration: document.getElementById('durationPill'),
+};
+
+const flowSteps = [
+  { key: 'parse', label: 'Planning Search Strategy', state: 'pending' },
+  { key: 'discovery', label: 'Searching Public Sources', state: 'pending' },
+  { key: 'visit', label: 'Visiting Websites', state: 'pending' },
+  { key: 'extract', label: 'Extracting Business Data', state: 'pending' },
+  { key: 'verify', label: 'Verifying Information', state: 'pending' },
+  { key: 'report', label: 'Compiling Final Report', state: 'pending' },
+];
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[ch]));
+}
+
+function clampScore(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.min(100, n));
+}
+
+function setFlow(key, state) {
+  const step = flowSteps.find(item => item.key === key);
+  if (step) step.state = state;
+  renderFlow();
+}
+
+function renderFlow() {
+  flowEl.innerHTML = flowSteps.map(step => {
+    const symbol = step.state === 'complete' ? '✓' : step.state === 'running' ? '•' : '';
+    const label = step.state === 'complete' ? 'Completed' : step.state === 'running' ? 'In Progress' : 'Pending';
+    return `
+      <div class="flow-item ${step.state}">
+        <span class="flow-dot">${symbol}</span>
+        <span class="flow-label">${escapeHtml(step.label)}</span>
+        <span class="flow-state">${label}</span>
+      </div>`;
+  }).join('');
+}
+
+function logLine(msg) {
+  const d = document.createElement('div');
+  d.textContent = msg;
+  activityEl.appendChild(d);
+  activityEl.scrollTop = activityEl.scrollHeight;
+}
+
+function setMetric(el, value) {
+  el.textContent = value ?? 0;
+}
+
+function renderBusinessCard(b, index, cached = false) {
+  const score = clampScore(b.verification_score);
+  const website = b.website || (b.source_urls && b.source_urls.website) || '';
+  return `
+    <article class="business-card">
+      <div class="card-visual">
+        <span class="rank">${index + 1}</span>
+        <span class="verified">${cached ? 'CACHED' : 'VERIFIED'}</span>
+      </div>
+      <div class="card-body">
+        <h3>${escapeHtml(b.business_name || 'Unknown Business')}</h3>
+        <p class="mini">${escapeHtml(b.phone || 'Phone requires source review')}</p>
+        <p class="mini">${escapeHtml(b.address || website || 'Address requires source review')}</p>
+        <div class="confidence">
+          <div class="confidence-row"><span>Confidence</span><strong>${score}%</strong></div>
+          <div class="meter"><span style="width:${score}%;"></span></div>
+        </div>
+      </div>
+    </article>`;
+}
+
+function renderBusinessList(businesses) {
+  if (!businesses || !businesses.length) {
+    businessesEl.innerHTML = '<div class="empty">No verified profiles yet. Try a longer run or a more specific business query.</div>';
+    return;
+  }
+  businessesEl.innerHTML = businesses.slice(0, 9).map((item, index) => renderBusinessCard(item, index)).join('');
+}
+
+function updateFromReport(report) {
+  setMetric(stats.discovered, report.businesses_discovered);
+  setMetric(stats.profiles, report.profiles_extracted);
+  setMetric(stats.verified, report.businesses_fully_verified);
+  setMetric(stats.pages, report.pages_crawled);
+  setMetric(stats.sites, report.websites_visited);
+  setMetric(stats.confidence, report.average_verification_confidence);
+  setMetric(stats.cache, report.cache_hits);
+  setMetric(stats.manual, report.fields_requiring_manual_review);
+  setMetric(stats.duration, report.research_duration || '0 Minutes 0 Seconds');
+
+  const jsonExport = document.getElementById('jsonExport');
+  const csvExport = document.getElementById('csvExport');
+  const id = encodeURIComponent(report.generated_at);
+  jsonExport.href = `/api/export/json/${id}`;
+  csvExport.href = `/api/export/csv/${id}`;
+  jsonExport.classList.add('ready');
+  csvExport.classList.add('ready');
+
+  renderBusinessList(report.businesses || []);
+}
+
+function resetDashboard() {
+  fillEl.style.width = '0%';
+  runStateEl.textContent = 'Running';
+  activityEl.innerHTML = '';
+  businessesEl.innerHTML = '<div class="empty">Verified businesses will appear here as the agent completes extraction.</div>';
+  Object.values(stats).forEach(el => setMetric(el, el === stats.duration ? '0 Minutes 0 Seconds' : 0));
+  document.getElementById('jsonExport').classList.remove('ready');
+  document.getElementById('csvExport').classList.remove('ready');
+  flowSteps.forEach(step => step.state = 'pending');
+  setFlow('parse', 'running');
+}
+
+function updateFlowFromEvent(eventType, message) {
+  const msg = String(message || '').toLowerCase();
+  if (msg.includes('category=')) {
+    setFlow('parse', 'complete');
+    setFlow('discovery', 'running');
+  }
+  if (eventType === 'discovery') {
+    setFlow('discovery', 'running');
+  }
+  if (msg.includes('discovery complete')) {
+    setFlow('discovery', 'complete');
+    setFlow('visit', 'running');
+    setFlow('extract', 'running');
+  }
+  if (eventType === 'business_extracted' || eventType === 'business_cached') {
+    setFlow('visit', 'complete');
+    setFlow('extract', 'running');
+  }
+  if (msg.includes('resolving')) {
+    setFlow('extract', 'complete');
+    setFlow('verify', 'running');
+  }
+  if (eventType === 'business_verified') {
+    setFlow('verify', 'running');
+  }
+  if (msg.includes('updated source')) {
+    setFlow('verify', 'complete');
+    setFlow('report', 'running');
+  }
+  if (eventType === 'complete') {
+    flowSteps.forEach(step => step.state = 'complete');
+    renderFlow();
+  }
+}
+
+function startResearch() {
+  const query = document.getElementById('query').value.trim();
+  if (!query) return;
+  const locationMatch = query.match(/\bin\s+(.+)$/i);
+  document.getElementById('mapCenter').textContent = locationMatch ? locationMatch[1] : 'Research Area';
+
+  resetDashboard();
+  btn.disabled = true;
+
+  const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
+  const ws = new WebSocket(`${protocol}://${location.host}/ws/research`);
+  ws.onopen = () => ws.send(JSON.stringify({ query }));
+  ws.onmessage = (evt) => {
+    const e = JSON.parse(evt.data);
+    if (e.progress !== undefined) fillEl.style.width = `${e.progress}%`;
+    logLine(e.message);
+    updateFlowFromEvent(e.event_type, e.message);
+
+    if (e.event_type === 'business_verified') {
+      const existing = businessesEl.querySelector('.empty');
+      if (existing) businessesEl.innerHTML = '';
+      businessesEl.insertAdjacentHTML('afterbegin', renderBusinessCard(e.data, businessesEl.children.length));
+    }
+    if (e.event_type === 'business_cached') {
+      const existing = businessesEl.querySelector('.empty');
+      if (existing) businessesEl.innerHTML = '';
+      businessesEl.insertAdjacentHTML('afterbegin', renderBusinessCard(e.data, businessesEl.children.length, true));
+    }
+    if (e.event_type === 'complete') {
+      updateFromReport(e.data);
+      runStateEl.textContent = 'Complete';
+      btn.disabled = false;
+    }
+    if (e.event_type === 'error') {
+      runStateEl.textContent = 'Error';
+      logLine(`ERROR: ${e.message}`);
+      btn.disabled = false;
+    }
+  };
+  ws.onclose = () => { btn.disabled = false; };
+}
+
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.getElementById('query').value = chip.dataset.query;
+  });
+});
+
+btn.addEventListener('click', startResearch);
+document.getElementById('query').addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') startResearch();
+});
+
+renderFlow();
+</script>
+</body>
+</html>
